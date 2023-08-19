@@ -11,8 +11,20 @@ class Point {
 class Block
 {
     coords:Point[];
-    constructor(coords:Point[]) {
+    initX:number;
+    initY:number;
+    id:string;
+    createTime:number;
+    lastSavedTime:number;
+    alive:boolean;
+    constructor(coords:Point[],Y0:number,t:number) {
         this.coords = coords;
+        this.initX = Y0;
+        this.initY=t;
+        this.id = Date.now()+" "+Math.random();
+        this.createTime = t;
+        this.lastSavedTime = 0;
+        this.alive = true;
     }
 }
 
