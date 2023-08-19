@@ -65,7 +65,7 @@ function App() {
 				}
 
 				setTime((time) => time + 1);
-			}, 200);
+			}, 800);
 
 			return () => clearInterval(intv);
 		},
