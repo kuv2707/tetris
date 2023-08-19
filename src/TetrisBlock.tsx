@@ -20,7 +20,7 @@ function TetrisBlock({
 						left: (coord.x+block.initX) * BLOCK_SIZE,
 						top: (coord.y + block.initY) * BLOCK_SIZE,
 						// padding:"5px",
-						backgroundColor: "red",
+						backgroundColor: block.color,
 					}}
 				></div>
 			))}

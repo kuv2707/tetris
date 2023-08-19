@@ -7,7 +7,6 @@ import { GameContext } from "./GameContext";
 function App() {
 	const [blocks, setBlocks] = useState<Block[]>([] as Block[]);
 	const [time, setTime] = useState(0);
-	const [currentBlock, setCurrentBlock] = useState<Block>(blocks[0]);
 	const { BLOCK_SIZE } = useContext(GameContext);
 	useEffect(
 		function () {
@@ -16,52 +15,43 @@ function App() {
 				BLOCK_SIZE + "px"
 			);
 
-			function isOccupied(x:number,y:number,blocks:Block[],currB:Block) {
-        if(y>11) return true
-        
-				for (const block of blocks) {
-          if(block===currB) continue;
-					for (const coord of block.coords) {
-						if (
-							coord.x + block.initX === x &&
-							coord.y + block.initY === y
-						)
-							return true;
-					}
-				}
-				return false;
-			}
 			const intv = setInterval(function () {
-				console.log(time);
 				setBlocks((blocks) => [
 					...blocks.map((block) => {
-            if(block.alive===false) return block
-            let verdict=true;
-            for(const coord of block.coords){
-              if(isOccupied(coord.x+block.initX,coord.y+block.initY+1,blocks,block)){
-                verdict=false;
-                break;
-              }
-            }
+						if (block.alive === false) return block;
+						let verdict = true;
+						for (const coord of block.coords) {
+							if (
+								isOccupied(
+									coord.x + block.initX,
+									coord.y + block.initY + 1,
+									blocks,
+									block
+								)
+							) {
+								verdict = false;
+								break;
+							}
+						}
 
-
-						if ( verdict)
+						if (verdict)
 							return new Block(
 								block.coords,
 								block.initX,
-								block.initY + 1
+								block.initY + 1,
+								block.color
 							);
 						else {
-              block.alive=false;
+							block.alive = false;
 
-              return block;
-            }
+							return block;
+						}
 					}),
 				]);
 				if (time % 5 === 0) {
 					const newb = getRandomBlock();
-					setBlocks((blocks)=>[...blocks, newb]);
-					setCurrentBlock(blocks[blocks.length - 1]);
+					setBlocks((blocks) => [...blocks, newb]);
+					// setCurrentBlock(blocks[blocks.length - 1]);
 				}
 
 				setTime((time) => time + 1);
@@ -71,12 +61,60 @@ function App() {
 		},
 		[BLOCK_SIZE, time, blocks]
 	);
+	function isOccupied(x: number, y: number, blocks: Block[], currB: Block) {
+		if (y > 12) return true;
 
+		for (const block of blocks) {
+			if (block === currB) continue;
+			for (const coord of block.coords) {
+				if (coord.x + block.initX === x && coord.y + block.initY === y)
+					return true;
+			}
+		}
+		return false;
+	}
 	useEffect(function () {
 		function cb(e: KeyboardEvent) {
-			if (e.key === "ArrowLeft")
-				currentBlock.initX > 0 ? currentBlock.initX-- : 10;
-			else if (e.key === "ArrowRight") currentBlock.initX++;
+			let cbb = blocks[0];
+			for (let i = 0; i < blocks.length; i++) {
+				if (blocks[i].alive) {
+					cbb = blocks[i];
+					break;
+				}
+			}
+			// setCurrentBlock(cbb)
+			const currentBlock = cbb;
+			if (e.key === "ArrowLeft") {
+				if (
+					!isOccupied(
+						(currentBlock.initX - 1) % 17,
+						currentBlock.initY,
+						blocks,
+						currentBlock
+					)
+				) {
+					currentBlock.initX = (17+currentBlock.initX - 1) % 17;
+					setBlocks((blocks) => [
+						currentBlock,
+						...blocks.filter((block) => block != currentBlock),
+					]);
+				}
+			} else if (e.key === "ArrowRight") {
+				if (
+					!isOccupied(
+						(currentBlock.initX + 1) % 17,
+						currentBlock.initY,
+						blocks,
+						currentBlock
+					)
+				) {
+					currentBlock.initX = (17+currentBlock.initX + 1) % 17;
+					setBlocks((blocks) => [
+						currentBlock,
+						...blocks.filter((block) => block != currentBlock),
+					]);
+				}
+			}
 		}
 		document.addEventListener("keydown", cb);
 		return () => document.removeEventListener("keydown", cb);

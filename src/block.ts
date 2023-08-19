@@ -17,7 +17,8 @@ class Block
     createTime:number;
     lastSavedTime:number;
     alive:boolean;
-    constructor(coords:Point[],Y0:number,t:number) {
+    color:string;
+    constructor(coords:Point[],Y0:number,t:number,col:string="") {
         this.coords = coords;
         this.initX = Y0;
         this.initY=t;
@@ -25,6 +26,9 @@ class Block
         this.createTime = t;
         this.lastSavedTime = 0;
         this.alive = true;
+        this.color = col||`rgb(${Math.random() * 255} ${Math.random() * 255} ${
+			Math.random() * 255
+		})`;
     }
 }
 
