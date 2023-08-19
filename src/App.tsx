@@ -16,10 +16,11 @@ function App() {
 				BLOCK_SIZE + "px"
 			);
 
-			function isOccupied(x:number,y:number) {
+			function isOccupied(x:number,y:number,blocks:Block[],currB:Block) {
         if(y>11) return true
-        else return false
+        
 				for (const block of blocks) {
+          if(block===currB) continue;
 					for (const coord of block.coords) {
 						if (
 							coord.x + block.initX === x &&
@@ -35,7 +36,16 @@ function App() {
 				setBlocks((blocks) => [
 					...blocks.map((block) => {
             if(block.alive===false) return block
-						if (!isOccupied(block.initX, block.initY + 1))
+            let verdict=true;
+            for(const coord of block.coords){
+              if(isOccupied(coord.x+block.initX,coord.y+block.initY+1,blocks,block)){
+                verdict=false;
+                break;
+              }
+            }
+
+
+						if ( verdict)
 							return new Block(
 								block.coords,
 								block.initX,
@@ -48,7 +58,7 @@ function App() {
             }
 					}),
 				]);
-				if (time % 50 === 0) {
+				if (time % 5 === 0) {
 					const newb = getRandomBlock();
 					setBlocks((blocks)=>[...blocks, newb]);
 					setCurrentBlock(blocks[blocks.length - 1]);
